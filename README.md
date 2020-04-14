@@ -1,5 +1,5 @@
 ## Antlr4Demo
 
-Antlr4 使用 demo
+Antlr4 使用 demo：
 
-+ 解析 sql 的输入输出表
++ 解析 spark sql 的输入输出表
