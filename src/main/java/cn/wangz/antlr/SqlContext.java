@@ -1,4 +1,4 @@
-package cn.wangz.antlr.listener;
+package cn.wangz.antlr;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

@@ -1,11 +1,10 @@
 package cn.wangz.antlr;
 
-import cn.wangz.antlr.listener.SqlContext;
 import cn.wangz.antlr.listener.StatementSqlListener;
 import cn.wangz.antlr.parser.SqlBaseLexer;
 import cn.wangz.antlr.parser.SqlBaseParser;
 import cn.wangz.antlr.stream.ANTLRNoCaseStringStream;
-import org.antlr.v4.runtime.CharStreams;
+import cn.wangz.antlr.visit.StatementSqlVisitor;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
@@ -16,6 +15,8 @@ import org.antlr.v4.runtime.tree.ParseTreeWalker;
 public class Main {
 
     public static void main(String[] args) {
+
+        //language=sql
         String sql = "insert into in_db.in_tab select * from sc_db1.sc_tab1 a left join sc_db2.sc_tab2 b on a.id2 = b.id limit 10";
 
         // 词法分析器
@@ -26,14 +27,26 @@ public class Main {
 
         SqlBaseParser parser = new SqlBaseParser(tokenStream);
 
+        SqlBaseParser.StatementContext statementContext = parser.statement();
+        // listener walker
+        SqlContext listenerSqlContext = new SqlContext();
         ParseTreeWalker walker = new ParseTreeWalker();
-        SqlContext sqlContext = new SqlContext();
-        walker.walk(new StatementSqlListener(sqlContext), parser.statement());
+        walker.walk(new StatementSqlListener(listenerSqlContext), statementContext);
+        System.out.println("--------- listener source tables ---------");
+        listenerSqlContext.getSourceTables().forEach(value -> System.out.println(value));
+        System.out.println("--------- listener target tables ---------");
+        listenerSqlContext.getTargetTables().forEach(value -> System.out.println(value));
 
-        System.out.println("--------- source tables ---------");
-        sqlContext.getSourceTables().forEach(value -> System.out.println(value));
-        System.out.println("--------- target tables ---------");
-        sqlContext.getTargetTables().forEach(value -> System.out.println(value));
+        System.out.println();
+
+        // visitor
+        SqlContext visitorSqlContext = new SqlContext();
+        StatementSqlVisitor visitor = new StatementSqlVisitor(visitorSqlContext);
+        visitor.visit(statementContext);
+        System.out.println("--------- visitor source tables ---------");
+        visitorSqlContext.getSourceTables().forEach(value -> System.out.println(value));
+        System.out.println("--------- visitor target tables ---------");
+        visitorSqlContext.getTargetTables().forEach(value -> System.out.println(value));
     }
 
 }
