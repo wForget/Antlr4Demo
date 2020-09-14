@@ -4,6 +4,7 @@ import cn.wangz.antlr.listener.StatementSqlListener;
 import cn.wangz.antlr.parser.SqlBaseLexer;
 import cn.wangz.antlr.parser.SqlBaseParser;
 import cn.wangz.antlr.stream.ANTLRNoCaseStringStream;
+import cn.wangz.antlr.visit.StatementSqlToStringVisitor;
 import cn.wangz.antlr.visit.StatementSqlVisitor;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
@@ -28,6 +29,13 @@ public class Main {
         SqlBaseParser parser = new SqlBaseParser(tokenStream);
 
         SqlBaseParser.StatementContext statementContext = parser.statement();
+
+        String rawText = statementContext.getText();
+        System.out.println("raw text: " + rawText);
+        StatementSqlToStringVisitor sqlToStringVisitor = new StatementSqlToStringVisitor();
+        String visitorText = sqlToStringVisitor.visit(statementContext).toString();
+        System.out.println("visitor to text:" + visitorText);
+
         // listener walker
         SqlContext listenerSqlContext = new SqlContext();
         ParseTreeWalker walker = new ParseTreeWalker();
